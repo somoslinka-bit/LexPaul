@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 export default function Hero() {
   return (
     <section className="hero-bg hero-noise relative overflow-hidden pt-16">
@@ -58,19 +60,19 @@ export default function Hero() {
           </div>
 
           {/* Columna imagen */}
-          {/* TODO: REEMPLAZAR con foto real de Paul Avhust */}
           <div className="mt-10 lg:mt-0 lg:flex-shrink-0 lg:w-[38%]">
             <div
-              className="relative rounded-xl overflow-hidden bg-primary-mid border border-white/10 flex items-center justify-center"
+              className="relative rounded-xl overflow-hidden"
               style={{ aspectRatio: '3/4', maxHeight: '420px' }}
             >
-              <div className="text-center px-6">
-                <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-3">
-                  <UserIcon className="w-8 h-8 text-white/50" />
-                </div>
-                <p className="text-white/50 font-sans text-sm">Foto Paul Avhust</p>
-                <p className="text-white/30 font-sans text-xs mt-1">3:4 · reemplazar con foto real</p>
-              </div>
+              <Image
+                src="/paul-avhust.png"
+                alt="Paul Avhust — Abogado especialista en Extranjería e Inmigración en España"
+                fill
+                className="object-cover object-top"
+                priority
+                sizes="(max-width: 1024px) 90vw, 38vw"
+              />
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-primary/80 to-transparent">
                 <p className="text-white font-lora font-semibold text-base">Paul Avhust</p>
                 <p className="text-white/65 font-sans text-xs mt-0.5">Abogado especialista en Extranjería</p>
@@ -127,10 +129,3 @@ function MapPinIcon() {
   )
 }
 
-function UserIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-    </svg>
-  )
-}
