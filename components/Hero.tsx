@@ -178,22 +178,26 @@ export default function Hero() {
         {/* Nombre centrado */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4">
           <div className="relative text-center">
-            <BlurText
-              text="PAUL"
-              delay={90}
-              animateBy="letters"
-              direction="top"
-              className="font-bold text-[22vw] sm:text-[140px] md:text-[175px] lg:text-[205px] leading-[0.78] tracking-tighter uppercase justify-center whitespace-nowrap"
-              style={{ color: '#C8963E', fontFamily: 'var(--font-lora)' }}
-            />
-            <BlurText
-              text="AVHUST"
-              delay={90}
-              animateBy="letters"
-              direction="top"
-              className="font-bold text-[22vw] sm:text-[140px] md:text-[175px] lg:text-[205px] leading-[0.78] tracking-tighter uppercase justify-center whitespace-nowrap"
-              style={{ color: '#C8963E', fontFamily: 'var(--font-lora)' }}
-            />
+            <div>
+              <BlurText
+                text="PAUL"
+                delay={90}
+                animateBy="letters"
+                direction="top"
+                className="font-bold text-[22vw] sm:text-[140px] md:text-[175px] lg:text-[205px] leading-[0.78] tracking-tighter uppercase justify-center whitespace-nowrap"
+                style={{ color: '#C8963E', fontFamily: 'var(--font-lora)' }}
+              />
+            </div>
+            <div>
+              <BlurText
+                text="AVHUST"
+                delay={90}
+                animateBy="letters"
+                direction="top"
+                className="font-bold text-[22vw] sm:text-[140px] md:text-[175px] lg:text-[205px] leading-[0.78] tracking-tighter uppercase justify-center whitespace-nowrap"
+                style={{ color: '#C8963E', fontFamily: 'var(--font-lora)' }}
+              />
+            </div>
 
             {/* Foto */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
@@ -210,20 +214,18 @@ export default function Hero() {
                 />
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Tagline */}
-        <div className="absolute bottom-16 sm:bottom-20 md:bottom-24 lg:bottom-32 left-1/2 -translate-x-1/2 w-full px-6">
-          <div className="flex justify-center">
-            <BlurText
-              text="Abogado de extranjería para latinoamericanos en España."
-              delay={120}
-              animateBy="words"
-              direction="top"
-              className="text-[13px] sm:text-[16px] md:text-[18px] lg:text-[20px] text-center justify-center"
-              style={{ color: 'rgba(245,243,238,0.55)', fontFamily: 'var(--font-dm-sans)' }}
-            />
+            {/* Tagline */}
+            <div className="mt-5 sm:mt-7">
+              <BlurText
+                text="Abogado de extranjería en España."
+                delay={120}
+                animateBy="words"
+                direction="top"
+                className="text-[13px] sm:text-[15px] md:text-[17px] lg:text-[19px] text-center justify-center"
+                style={{ color: 'rgba(245,243,238,0.5)', fontFamily: 'var(--font-dm-sans)' }}
+              />
+            </div>
           </div>
         </div>
 
