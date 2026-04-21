@@ -1,131 +1,244 @@
+'use client'
+
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import Image from 'next/image'
+import { Menu, X, ChevronDown } from 'lucide-react'
+
+interface BlurTextProps {
+  text: string
+  delay?: number
+  animateBy?: 'words' | 'letters'
+  direction?: 'top' | 'bottom'
+  className?: string
+  style?: React.CSSProperties
+}
+
+const BlurText: React.FC<BlurTextProps> = ({
+  text,
+  delay = 50,
+  animateBy = 'words',
+  direction = 'top',
+  className = '',
+  style,
+}) => {
+  const [inView, setInView] = useState(false)
+  const ref = useRef<HTMLParagraphElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setInView(true)
+      },
+      { threshold: 0.1 }
+    )
+    if (ref.current) observer.observe(ref.current)
+    return () => {
+      if (ref.current) observer.unobserve(ref.current)
+    }
+  }, [])
+
+  const segments = useMemo(() => {
+    return animateBy === 'words' ? text.split(' ') : text.split('')
+  }, [text, animateBy])
+
+  return (
+    <p ref={ref} className={`inline-flex flex-wrap ${className}`} style={style}>
+      {segments.map((segment, i) => (
+        <span
+          key={i}
+          style={{
+            display: 'inline-block',
+            filter: inView ? 'blur(0px)' : 'blur(10px)',
+            opacity: inView ? 1 : 0,
+            transform: inView ? 'translateY(0)' : `translateY(${direction === 'top' ? '-20px' : '20px'})`,
+            transition: `all 0.5s ease-out ${i * delay}ms`,
+          }}
+        >
+          {segment}
+          {animateBy === 'words' && i < segments.length - 1 ? ' ' : ''}
+        </span>
+      ))}
+    </p>
+  )
+}
+
+const menuItems = [
+  { label: 'INICIO', href: '#', highlight: true },
+  { label: 'SERVICIOS', href: '#servicios' },
+  { label: 'CÓMO FUNCIONA', href: '#como-funciona' },
+  { label: 'CONSULTA', href: '#consulta' },
+]
 
 export default function Hero() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isMenuOpen &&
+        menuRef.current &&
+        buttonRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isMenuOpen])
+
   return (
-    <section className="hero-bg hero-noise relative overflow-hidden pt-16">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:gap-12">
+    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: '#0B1F3A', color: '#F5F3EE' }}>
 
-          {/* Columna texto */}
-          <div className="flex-1 lg:max-w-[55%]">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 border border-white/25 rounded-full px-4 py-1.5 mb-6">
-              <span className="text-white/85 text-xs font-sans font-medium tracking-wide">
-                Especialista en Extranjería · España 🇪🇸
-              </span>
-            </div>
+      {/* Navbar */}
+      <header className="fixed top-0 left-0 right-0 z-50 px-6 py-5">
+        <nav className="flex items-center justify-between max-w-screen-2xl mx-auto">
 
-            {/* H1 */}
-            <h1
-              className="font-lora font-bold leading-tight mb-5"
-              style={{ fontSize: 'clamp(28px, 5.5vw, 50px)' }}
+          {/* Hamburger */}
+          <div className="relative">
+            <button
+              ref={buttonRef}
+              type="button"
+              className="p-2 transition-colors duration-300"
+              style={{ color: 'rgba(245,243,238,0.45)' }}
+              aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <span className="block text-white">Resolvé tu situación migratoria</span>
-              <span className="block text-accent">con un abogado de confianza</span>
-            </h1>
+              {isMenuOpen
+                ? <X className="w-7 h-7" strokeWidth={2} />
+                : <Menu className="w-7 h-7" strokeWidth={2} />
+              }
+            </button>
 
-            {/* Subtítulo */}
-            <p className="font-sans text-white/80 text-base sm:text-lg leading-relaxed mb-8 max-w-lg">
-              Asilo, TIE, toma de huellas, canje de licencia y más.
-              Atención para latinoamericanos en toda España.
-            </p>
-
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-8">
-              <a
-                href="https://wa.me/NUMERO_PLACEHOLDER?text=Hola%2C%20me%20gustar%C3%ADa%20hacer%20una%20consulta%20sobre%20mi%20situaci%C3%B3n%20migratoria."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2.5 bg-whatsapp hover:bg-whatsapp-dark text-white font-sans font-semibold text-base px-6 py-3.5 rounded-btn transition-colors duration-200 cursor-pointer min-h-[52px]"
+            {isMenuOpen && (
+              <div
+                ref={menuRef}
+                className="absolute top-full left-0 w-[220px] shadow-2xl mt-2 ml-2 p-4 rounded-xl z-[100]"
+                style={{ backgroundColor: '#0B1F3A', border: '1px solid rgba(200,150,62,0.25)' }}
               >
-                <WhatsAppIcon className="w-5 h-5 flex-shrink-0" />
-                Consultar por WhatsApp
-              </a>
-              <a
-                href="#servicios"
-                className="flex items-center justify-center border border-white/35 hover:border-white/60 hover:bg-white/5 text-white font-sans font-semibold text-base px-6 py-3.5 rounded-btn transition-all duration-200 cursor-pointer min-h-[52px]"
-              >
-                Ver servicios
-              </a>
-            </div>
-
-            {/* Trust bar */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <TrustItem icon={<LockIcon />} label="Consulta confidencial" />
-              <span className="text-white/25 hidden sm:block">·</span>
-              <TrustItem icon={<BoltIcon />} label="Respuesta en 24hs" />
-              <span className="text-white/25 hidden sm:block">·</span>
-              <TrustItem icon={<MapPinIcon />} label="Toda España" />
-            </div>
+                {menuItems.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="block text-sm font-bold tracking-widest py-2 px-2 cursor-pointer transition-colors duration-200"
+                    style={{
+                      color: item.highlight ? '#C8963E' : 'rgba(245,243,238,0.75)',
+                      fontFamily: 'var(--font-dm-sans)',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = '#C8963E' }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = item.highlight ? '#C8963E' : 'rgba(245,243,238,0.75)'
+                    }}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+                <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(200,150,62,0.2)' }}>
+                  <a
+                    href="#consulta"
+                    className="block text-center text-xs font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200"
+                    style={{ backgroundColor: '#C8963E', color: '#fff', fontFamily: 'var(--font-dm-sans)' }}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Consulta gratis
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Columna imagen */}
-          <div className="mt-10 lg:mt-0 lg:flex-shrink-0 lg:w-[38%]">
-            <div
-              className="relative rounded-xl overflow-hidden"
-              style={{ aspectRatio: '3/4', maxHeight: '420px' }}
-            >
-              <Image
-                src="/paul-avhust.png"
-                alt="Paul Avhust — Abogado especialista en Extranjería e Inmigración en España"
-                fill
-                className="object-cover object-top"
-                priority
-                sizes="(max-width: 1024px) 90vw, 38vw"
-              />
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-primary/80 to-transparent">
-                <p className="text-white font-lora font-semibold text-base">Paul Avhust</p>
-                <p className="text-white/65 font-sans text-xs mt-0.5">Abogado especialista en Extranjería</p>
+          {/* Wordmark */}
+          <span
+            className="text-xl font-bold tracking-widest"
+            style={{ color: '#C8963E', fontFamily: 'var(--font-lora)' }}
+          >
+            LEX-PAUL
+          </span>
+
+          {/* WhatsApp CTA */}
+          <a
+            href="https://wa.me/NUMERO_PLACEHOLDER?text=Hola%2C%20me%20gustar%C3%ADa%20hacer%20una%20consulta%20migratoria."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-lg transition-opacity duration-200 hover:opacity-80"
+            style={{ backgroundColor: '#25D366', color: '#fff', fontFamily: 'var(--font-dm-sans)' }}
+          >
+            WhatsApp
+          </a>
+        </nav>
+      </header>
+
+      {/* Hero */}
+      <main className="relative min-h-screen flex flex-col">
+
+        {/* Nombre centrado */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4">
+          <div className="relative text-center">
+            <BlurText
+              text="PAUL"
+              delay={90}
+              animateBy="letters"
+              direction="top"
+              className="font-bold text-[22vw] sm:text-[140px] md:text-[175px] lg:text-[205px] leading-[0.78] tracking-tighter uppercase justify-center whitespace-nowrap"
+              style={{ color: '#C8963E', fontFamily: 'var(--font-lora)' }}
+            />
+            <BlurText
+              text="AVHUST"
+              delay={90}
+              animateBy="letters"
+              direction="top"
+              className="font-bold text-[22vw] sm:text-[140px] md:text-[175px] lg:text-[205px] leading-[0.78] tracking-tighter uppercase justify-center whitespace-nowrap"
+              style={{ color: '#C8963E', fontFamily: 'var(--font-lora)' }}
+            />
+
+            {/* Foto */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+              <div className="relative w-[58px] h-[98px] sm:w-[82px] sm:h-[138px] md:w-[100px] md:h-[168px] lg:w-[118px] lg:h-[200px] rounded-full overflow-hidden shadow-2xl transition-transform duration-300 hover:scale-105 cursor-pointer"
+                style={{ boxShadow: '0 0 0 3px rgba(200,150,62,0.35), 0 8px 32px rgba(11,31,58,0.5)' }}
+              >
+                <Image
+                  src="/paul-avhust.png"
+                  alt="Paul Avhust — Abogado especialista en Extranjería e Inmigración"
+                  fill
+                  className="object-cover object-top"
+                  priority
+                  sizes="(max-width: 640px) 58px, (max-width: 768px) 82px, (max-width: 1024px) 100px, 118px"
+                />
               </div>
             </div>
           </div>
-
         </div>
-      </div>
-    </section>
-  )
-}
 
-function TrustItem({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-accent/80 w-4 h-4 flex-shrink-0">{icon}</span>
-      <span className="text-white/65 font-sans text-xs font-medium">{label}</span>
+        {/* Tagline */}
+        <div className="absolute bottom-16 sm:bottom-20 md:bottom-24 lg:bottom-32 left-1/2 -translate-x-1/2 w-full px-6">
+          <div className="flex justify-center">
+            <BlurText
+              text="Abogado de extranjería para latinoamericanos en España."
+              delay={120}
+              animateBy="words"
+              direction="top"
+              className="text-[13px] sm:text-[16px] md:text-[18px] lg:text-[20px] text-center justify-center"
+              style={{ color: 'rgba(245,243,238,0.55)', fontFamily: 'var(--font-dm-sans)' }}
+            />
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <button
+          type="button"
+          className="absolute bottom-5 md:bottom-8 left-1/2 -translate-x-1/2 transition-opacity duration-300 hover:opacity-100"
+          style={{ opacity: 0.35 }}
+          aria-label="Scroll hacia abajo"
+          onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}
+        >
+          <ChevronDown className="w-6 h-6 md:w-8 md:h-8" style={{ color: '#F5F3EE' }} />
+        </button>
+
+      </main>
     </div>
   )
 }
-
-function WhatsAppIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.858L.036 23.999l6.291-1.651A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.891 0-3.651-.507-5.162-1.39l-.37-.22-3.734.979 1-3.635-.24-.378A9.635 9.635 0 012.182 12C2.182 6.573 6.573 2.182 12 2.182S21.818 6.573 21.818 12 17.427 21.818 12 21.818z" />
-    </svg>
-  )
-}
-
-function LockIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  )
-}
-
-function BoltIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </svg>
-  )
-}
-
-function MapPinIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-      <circle cx="12" cy="10" r="3" />
-    </svg>
-  )
-}
-
